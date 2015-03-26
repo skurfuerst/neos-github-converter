@@ -1,0 +1,3 @@
+[submodule "git-merge-repos"]
+	path = git-merge-repos
+	url = https://github.com/robinst/git-merge-repos.git
