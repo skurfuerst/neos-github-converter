@@ -6,7 +6,11 @@ DISTRIBUTION_DIRECTORY=`pwd`/../neosbase
 
 
 function relocatePackage {
-  PACKAGEKEY=$1
+  PACKAGEPATH=$1
+
+  cp -R $PACKAGEPATH .
+
+  PACKAGEKEY=`basename $PACKAGEPATH`
 
   cd $PACKAGEKEY
   git filter-branch --index-filter \
@@ -24,14 +28,11 @@ rm -Rf tmp
 mkdir tmp
 cd tmp
 
-cp -R $PACKAGE_DIRECTORY/Application/TYPO3.TYPO3CR TYPO3.TYPO3CR
-relocatePackage TYPO3.TYPO3CR
-
-cp -R $PACKAGE_DIRECTORY/Application/TYPO3.Neos.NodeTypes TYPO3.Neos.NodeTypes
-relocatePackage TYPO3.Neos.NodeTypes
-
-#cp -R $PACKAGE_DIRECTORY/Application/TYPO3.Neos TYPO3.Neos
-#relocatePackage TYPO3.Neos
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TYPO3CR
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.NodeTypes
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Kickstarter
+# relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos
 
 mkdir FINAL
 cd FINAL
@@ -43,6 +44,10 @@ git commit -m "add readme"
 
 # We want to "Preserve History for Paths"
 #../../git-merge-repos/run.sh `pwd`/../TYPO3.TYPO3CR:. `pwd`/../TYPO3.Neos:.
-../../git-merge-repos/run.sh `pwd`/../TYPO3.TYPO3CR:. `pwd`/../TYPO3.Neos.NodeTypes:.
+../../git-merge-repos/run.sh \
+  `pwd`/../TYPO3.TYPO3CR:. \
+  `pwd`/../TYPO3.Neos.NodeTypes:. \
+  `pwd`/../TYPO3.Neos.TypoScript:. \
+  `pwd`/../TYPO3.Neos.Kickstarter:.
 
 #git subtree add --prefix=TYPO3.TYPO3CR --message="Adding TYPO3.TYPO3CR to shared repository" ../TYPO3.TYPO3CR master
