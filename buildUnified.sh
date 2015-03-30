@@ -1,25 +1,53 @@
 #!/bin/bash
+set -e
 
 
 DISTRIBUTION_DIRECTORY=`pwd`/../neosbase
 
 
 
+function copyPackageIfNotExistsAndEnterTempDirectory {
+  PACKAGEPATH=$1
+  PACKAGEKEY=`basename $PACKAGEPATH`
+
+  if [ ! -d "$PACKAGEKEY" ]; then
+    cp -R $PACKAGEPATH .
+  fi
+
+  cd $PACKAGEKEY
+}
+
 function relocatePackage {
   PACKAGEPATH=$1
 
-  cp -R $PACKAGEPATH .
+  copyPackageIfNotExistsAndEnterTempDirectory $PACKAGEPATH
 
-  PACKAGEKEY=`basename $PACKAGEPATH`
-
-  cd $PACKAGEKEY
-  git filter-branch --index-filter \
+  git filter-branch -f --index-filter \
     'tab=$(printf "\t") && git ls-files -s | sed "s-$tab\"*-&'"$PACKAGEKEY"'/-" | GIT_INDEX_FILE=$GIT_INDEX_FILE.new git update-index --index-info && mv "$GIT_INDEX_FILE.new" "$GIT_INDEX_FILE"' \
     --tag-name-filter cat \
     -- --all
-  cd ../
+
+  cd ..
 }
 
+function skipCommitHash {
+  PACKAGEPATH=$1
+  HASH_TO_SKIP=$2
+
+  copyPackageIfNotExistsAndEnterTempDirectory $PACKAGEPATH
+
+  git filter-branch --commit-filter '
+    if [ "$GIT_COMMIT" = '"$HASH_TO_SKIP"' ];
+    then
+        skip_commit "$@";
+    else
+        git commit-tree "$@";
+    fi' \
+    --tag-name-filter cat \
+    -- --all
+
+  cd ..
+}
 
 PACKAGE_DIRECTORY=$DISTRIBUTION_DIRECTORY/Packages
 
@@ -28,26 +56,39 @@ rm -Rf tmp
 mkdir tmp
 cd tmp
 
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TYPO3CR
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.NodeTypes
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Kickstarter
+
+# we manually need to skip empty commits in Kickstart / Fluid (the first commit is empty!)
+skipCommitHash $PACKAGE_DIRECTORY/Framework/TYPO3.Kickstart cc6a1089d6beacde049fb435c7fc8feb6177945e
+relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Kickstart
+
+skipCommitHash $PACKAGE_DIRECTORY/Framework/TYPO3.Fluid a06f6e4be4cd49671f6265889543b6ff13decce1
+relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Fluid
+
+
+relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Eel
+relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Flow
+
+
+
+../git-merge-repos/run.sh \
+  `pwd`/TYPO3.Eel:. \
+  `pwd`/TYPO3.Flow:. \
+  `pwd`/TYPO3.Fluid:. \
+  `pwd`/TYPO3.Kickstart:.
+
+#mv merged-repo FINAL-Flow
+
+#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TYPO3CR
+#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.NodeTypes
+#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript
+#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Kickstarter
 # relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos
 
-mkdir FINAL
-cd FINAL
-git init
-touch README.md
-git add README.md
-git commit -m "add readme"
-
-
 # We want to "Preserve History for Paths"
-#../../git-merge-repos/run.sh `pwd`/../TYPO3.TYPO3CR:. `pwd`/../TYPO3.Neos:.
-../../git-merge-repos/run.sh \
-  `pwd`/../TYPO3.TYPO3CR:. \
-  `pwd`/../TYPO3.Neos.NodeTypes:. \
-  `pwd`/../TYPO3.Neos.TypoScript:. \
-  `pwd`/../TYPO3.Neos.Kickstarter:.
+#../git-merge-repos/run.sh \
+#  `pwd`/TYPO3.TYPO3CR:. \
+#  `pwd`/TYPO3.Neos.NodeTypes:. \
+#  `pwd`/TYPO3.Neos.TypoScript:. \
+#  `pwd`/TYPO3.Neos.Kickstarter:.
 
 #git subtree add --prefix=TYPO3.TYPO3CR --message="Adding TYPO3.TYPO3CR to shared repository" ../TYPO3.TYPO3CR master
