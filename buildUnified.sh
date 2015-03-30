@@ -60,11 +60,8 @@ cd tmp
 # we manually need to skip empty commits in Kickstart / Fluid (the first commit is empty!)
 skipCommitHash $PACKAGE_DIRECTORY/Framework/TYPO3.Kickstart cc6a1089d6beacde049fb435c7fc8feb6177945e
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Kickstart
-
 skipCommitHash $PACKAGE_DIRECTORY/Framework/TYPO3.Fluid a06f6e4be4cd49671f6265889543b6ff13decce1
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Fluid
-
-
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Eel
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Flow
 
@@ -76,19 +73,36 @@ relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Flow
   `pwd`/TYPO3.Fluid:. \
   `pwd`/TYPO3.Kickstart:.
 
-#mv merged-repo FINAL-Flow
+mv merged-repo FINAL-Flow
 
-#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TYPO3CR
-#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.NodeTypes
-#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript
-#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Kickstarter
-# relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Form
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Imagine
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Media
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Kickstarter
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.NodeTypes
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Seo
+skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.Party d63e2db37bcb7f2fa0137e7a6fb13b26a7e1da40
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Party
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Setup
+# TYPO3.Twitter.Bootstrap missing
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TYPO3CR
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript
+
+
 
 # We want to "Preserve History for Paths"
-#../git-merge-repos/run.sh \
-#  `pwd`/TYPO3.TYPO3CR:. \
-#  `pwd`/TYPO3.Neos.NodeTypes:. \
-#  `pwd`/TYPO3.Neos.TypoScript:. \
-#  `pwd`/TYPO3.Neos.Kickstarter:.
+../git-merge-repos/run.sh \
+  `pwd`/TYPO3.Form:. \
+  `pwd`/TYPO3.Imagine:. \
+  `pwd`/TYPO3.Media:. \
+  `pwd`/TYPO3.Neos:. \
+  `pwd`/TYPO3.Neos.Kickstarter:. \
+  `pwd`/TYPO3.Neos.NodeTypes:. \
+  `pwd`/TYPO3.Neos.Seo:. \
+  `pwd`/TYPO3.Party:. \
+  `pwd`/TYPO3.Setup:. \
+  `pwd`/TYPO3.TYPO3CR:. \
+  `pwd`/TYPO3.TypoScript:.
 
-#git subtree add --prefix=TYPO3.TYPO3CR --message="Adding TYPO3.TYPO3CR to shared repository" ../TYPO3.TYPO3CR master
+mv merged-repo FINAL-Neos
