@@ -33,6 +33,12 @@ function relocatePackage {
     --tag-name-filter cat \
     -- --all
 
+
+  # transfer BRANCHES -> TAGS (because they are kept for the migration)
+  for BRANCH in `git branch --all | grep origin | grep -v HEAD | grep -v master`
+  do
+    git tag --force branch-`basename $BRANCH` $BRANCH
+  done
   cd ..
 }
 
@@ -55,6 +61,16 @@ function skipCommitHash {
   cd ..
 }
 
+function recreateBranches {
+  cd merged-repo
+  for tagBranch in `git tag | grep branch`; do
+    git branch ${tagBranch:7} $tagBranch
+    git tag -d $tagBranch
+  done
+
+  cd ..
+}
+
 PACKAGE_DIRECTORY=$DISTRIBUTION_DIRECTORY/Packages
 
 
@@ -72,12 +88,13 @@ relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Eel
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Flow
 
 
-
 ../git-merge-repos/run.sh \
   `pwd`/TYPO3.Eel:. \
   `pwd`/TYPO3.Flow:. \
   `pwd`/TYPO3.Fluid:. \
   `pwd`/TYPO3.Kickstart:.
+
+recreateBranches
 
 mv merged-repo FINAL-Flow
 
@@ -111,4 +128,6 @@ relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript
   `pwd`/TYPO3.TYPO3CR:. \
   `pwd`/TYPO3.TypoScript:.
 
+recreateBranches
 mv merged-repo FINAL-Neos
+
