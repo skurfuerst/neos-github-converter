@@ -2,7 +2,13 @@
 set -e
 
 
-DISTRIBUTION_DIRECTORY=`pwd`/../neosbase
+DISTRIBUTION_DIRECTORY=`pwd`/tmp-old-neos
+
+rm -Rf $DISTRIBUTION_DIRECTORY
+git clone git://git.typo3.org/Neos/Distributions/Base.git tmp-old-neos
+cd tmp-old-neos
+composer install
+cd ../
 
 
 
