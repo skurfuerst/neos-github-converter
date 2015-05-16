@@ -10,13 +10,33 @@ for i in `echo $NEOS_PACKAGES | tr " " "\n"`; do
     curl -u "$GITHUB_USER:YOUR_PERSONAL_GITHUB_ACCESS_TOKEN_HERE" https://api.github.com/orgs/Neos-GitHub-Test-ReadOnlyPackages/repos -d "{\"name\":\"$i\"}"
 done
 
+cd tmp
+mkdir -p split/
+for i in `ls FINAL-Neos`; do
+    i=TYPO3.Form
+    rm -Rf split/$i
+    cp -R FINAL-Neos split/$i
+    cd split/$i
+    git remote rm origin
+    git filter-branch --subdirectory-filter $i --commit-filter '
+      if [ z$1 = z`git rev-parse $3^{tree}` ];then
+        skip_commit "$@";
+      else
+        git commit-tree "$@";
+      fi' --tag-name-filter cat -- --all
+    git reflog expire --expire=now --all
+    git gc --prune=now --aggressive
 
-mkdir -p tmp-split-neos
-cd tmp-split-neos
+    git remote add origin git@github.com:Neos-GitHub-Test-ReadOnlyPackages/$i.git
+    git push origin --force --all
+    git push origin --force --tags
+    cd ../../
+done
+cd ..
 
 ../git-subsplit/git-subsplit.sh init git@github.com:Neos-GitHub-Test/Neos.git
 ../git-subsplit/git-subsplit.sh update
-
+../git-subsplit/git-subsplit.sh publish TYPO3.Neos:git@github.com:Neos-GitHub-Test-ReadOnlyPackages/TYPO3.Neos.git
 ../git-subsplit/git-subsplit.sh publish "
     TYPO3.Form:git@github.com:Neos-GitHub-Test-ReadOnlyPackages/TYPO3.Form.git
     TYPO3.Media:git@github.com:Neos-GitHub-Test-ReadOnlyPackages/TYPO3.Media.git
