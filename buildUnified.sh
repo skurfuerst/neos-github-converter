@@ -35,7 +35,7 @@ function relocatePackage {
 
 
   # transfer BRANCHES -> TAGS (because they are kept for the migration)
-  for BRANCH in `git branch --all | grep origin | grep -v HEAD | grep -v master`
+  for BRANCH in `git branch --all | grep origin | grep -v HEAD | grep -v composer | grep -v flow-cms | grep -v GSoC2009| grep -v l10n | grep -v trunk | grep -v master`
   do
     git tag --force branch-`basename $BRANCH` $BRANCH
   done
@@ -86,13 +86,15 @@ skipCommitHash $PACKAGE_DIRECTORY/Framework/TYPO3.Fluid a06f6e4be4cd49671f626588
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Fluid
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Eel
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Flow
-
+skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.Party d63e2db37bcb7f2fa0137e7a6fb13b26a7e1da40
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Party
 
 ../git-merge-repos/run.sh \
   `pwd`/TYPO3.Eel:. \
   `pwd`/TYPO3.Flow:. \
   `pwd`/TYPO3.Fluid:. \
-  `pwd`/TYPO3.Kickstart:.
+  `pwd`/TYPO3.Kickstart:. \
+  `pwd`/TYPO3.Party:.
 
 recreateBranches
 
@@ -105,11 +107,18 @@ relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Kickstarter
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.NodeTypes
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Seo
-skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.Party d63e2db37bcb7f2fa0137e7a6fb13b26a7e1da40
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Party
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Setup
-# TYPO3.Twitter.Bootstrap missing
+relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Twitter.Bootstrap
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TYPO3CR
+cd TYPO3.TYPO3CR
+git tag -d 0.5.0-alpha1
+git tag -d 0.5.0-alpha2
+git tag -d 0.5.0-alpha3
+git tag -d 0.5.0-alpha4
+git tag -d 0.5.0-alpha5
+git tag -d 0.5.0-alpha6
+git tag -d 0.5.0-alpha7
+cd ..
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript
 
 
@@ -123,10 +132,10 @@ relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript
   `pwd`/TYPO3.Neos.Kickstarter:. \
   `pwd`/TYPO3.Neos.NodeTypes:. \
   `pwd`/TYPO3.Neos.Seo:. \
-  `pwd`/TYPO3.Party:. \
   `pwd`/TYPO3.Setup:. \
   `pwd`/TYPO3.TYPO3CR:. \
-  `pwd`/TYPO3.TypoScript:.
+  `pwd`/TYPO3.TypoScript:. \
+  `pwd`/TYPO3.Twitter.Bootstrap:.
 
 recreateBranches
 mv merged-repo FINAL-Neos
