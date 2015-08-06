@@ -86,29 +86,33 @@ skipCommitHash $PACKAGE_DIRECTORY/Framework/TYPO3.Fluid a06f6e4be4cd49671f626588
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Fluid
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Eel
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Flow
-skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.Party d63e2db37bcb7f2fa0137e7a6fb13b26a7e1da40
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Party
+#skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.Party d63e2db37bcb7f2fa0137e7a6fb13b26a7e1da40
+#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Party
 
 ../git-merge-repos/run.sh \
   `pwd`/TYPO3.Eel:. \
   `pwd`/TYPO3.Flow:. \
   `pwd`/TYPO3.Fluid:. \
-  `pwd`/TYPO3.Kickstart:. \
-  `pwd`/TYPO3.Party:.
+  `pwd`/TYPO3.Kickstart:.
+#  `pwd`/TYPO3.Party:.
 
 recreateBranches
 
 mv merged-repo FINAL-Flow
 
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Form
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Imagine
+# TYPO3.Form has different versions
+#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Form
+# TYPO3.Imagine has different versions
+# relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Imagine
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Media
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Kickstarter
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.NodeTypes
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Seo
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Setup
-relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Twitter.Bootstrap
+# neos-SEO has different package versions
+#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Seo
+#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Setup
+# different versioning scheme
+#relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Twitter.Bootstrap
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TYPO3CR
 cd TYPO3.TYPO3CR
 git tag -d 0.5.0-alpha1
@@ -125,18 +129,17 @@ relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript
 
 # We want to "Preserve History for Paths"
 ../git-merge-repos/run.sh \
-  `pwd`/TYPO3.Form:. \
-  `pwd`/TYPO3.Imagine:. \
   `pwd`/TYPO3.Media:. \
   `pwd`/TYPO3.Neos:. \
   `pwd`/TYPO3.Neos.Kickstarter:. \
   `pwd`/TYPO3.Neos.NodeTypes:. \
-  `pwd`/TYPO3.Neos.Seo:. \
-  `pwd`/TYPO3.Setup:. \
   `pwd`/TYPO3.TYPO3CR:. \
-  `pwd`/TYPO3.TypoScript:. \
-  `pwd`/TYPO3.Twitter.Bootstrap:.
+  `pwd`/TYPO3.TypoScript:.
+  #`pwd`/TYPO3.Setup:. \
+#  `pwd`/TYPO3.Twitter.Bootstrap:.
+#    `pwd`/TYPO3.Imagine:. \
+#`pwd`/TYPO3.Neos.Seo:. \
+#`pwd`/TYPO3.Form:. \
 
 recreateBranches
 mv merged-repo FINAL-Neos
-
