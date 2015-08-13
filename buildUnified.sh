@@ -42,18 +42,29 @@ function relocatePackage {
   cd ..
 }
 
+
+
+# This function does not only skip the given commit hash, but also records the original commit hash.
 function skipCommitHash {
   PACKAGEPATH=$1
   HASH_TO_SKIP=$2
 
   copyPackageIfNotExistsAndEnterTempDirectory $PACKAGEPATH
 
+  # note: the "nl" below looks very ugly (breaking indentation etc); but that's the only
+  # way I could get this to work.
+
   git filter-branch --commit-filter '
+nl="
+"
+    COMMIT_MESSAGE=`cat /dev/stdin`;
+    COMMIT_MESSAGE="$COMMIT_MESSAGE${nl}Original-Commit-Hash: $GIT_COMMIT";
+
     if [ "$GIT_COMMIT" = '"$HASH_TO_SKIP"' ];
     then
         skip_commit "$@";
     else
-        git commit-tree "$@";
+        git commit-tree "$@" -m "$COMMIT_MESSAGE";
     fi' \
     --tag-name-filter cat \
     -- --all
@@ -82,9 +93,14 @@ cd tmp
 # we manually need to skip empty commits in Kickstart / Fluid (the first commit is empty!)
 skipCommitHash $PACKAGE_DIRECTORY/Framework/TYPO3.Kickstart cc6a1089d6beacde049fb435c7fc8feb6177945e
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Kickstart
+
 skipCommitHash $PACKAGE_DIRECTORY/Framework/TYPO3.Fluid a06f6e4be4cd49671f6265889543b6ff13decce1
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Fluid
+
+skipCommitHash $PACKAGE_DIRECTORY/Framework/TYPO3.Eel 000000000
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Eel
+
+skipCommitHash $PACKAGE_DIRECTORY/Framework/TYPO3.Flow 000000000
 relocatePackage $PACKAGE_DIRECTORY/Framework/TYPO3.Flow
 #skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.Party d63e2db37bcb7f2fa0137e7a6fb13b26a7e1da40
 #relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Party
@@ -104,15 +120,25 @@ mv merged-repo FINAL-Flow
 #relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Form
 # TYPO3.Imagine has different versions
 # relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Imagine
+
+skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.Media 000000000
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Media
+
+skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.Neos 000000000
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos
+
+skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Kickstarter 000000000
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Kickstarter
+
+skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.Neos.NodeTypes 000000000
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.NodeTypes
 # neos-SEO has different package versions
 #relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Neos.Seo
 #relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Setup
 # different versioning scheme
 #relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.Twitter.Bootstrap
+
+skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.TYPO3CR 000000000
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TYPO3CR
 cd TYPO3.TYPO3CR
 git tag -d 0.5.0-alpha1
@@ -123,6 +149,8 @@ git tag -d 0.5.0-alpha5
 git tag -d 0.5.0-alpha6
 git tag -d 0.5.0-alpha7
 cd ..
+
+skipCommitHash $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript 000000000
 relocatePackage $PACKAGE_DIRECTORY/Application/TYPO3.TypoScript
 
 
